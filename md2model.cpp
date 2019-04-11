@@ -360,7 +360,7 @@ MD2Model* MD2Model::load(const char* filename) {
         }*/
         //Image* image = loadBMP(buffer);
         //QImage* image = new QImage("models/"+QString(buffer));
-        QImage* image = new QImage("models/girl.bmp");
+        QImage* image = new QImage(":/models/girl.bmp");
 	GLuint textureId = loadTexture(image);
 	delete image;
 	MD2Model* model = new MD2Model();

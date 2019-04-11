@@ -2,6 +2,7 @@
 #include "objparser.h"
 
 #include <QTransform>
+#include <QApplication>
 #include <cmath>
 
 MyWidget::MyWidget(QWidget *parent) :
@@ -12,7 +13,7 @@ MyWidget::MyWidget(QWidget *parent) :
     maxStepZ=stepSize*0.8;
 
     ObjParser parser;
-    QString fileName("maps/cosik.obj");
+    QString fileName(":/maps/cosik.obj");
     parser.parse(fileName);
     floor=parser.getTriangles();
 
@@ -284,6 +285,18 @@ void MyWidget::paintGL()
     }
 }
 
+void MyWidget::perspectiveGL( GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar )
+{
+    const GLdouble pi = 3.1415926535897932384626433832795;
+    GLdouble fW, fH;
+
+    //fH = tan( (fovY / 2) / 180 * pi ) * zNear;
+    fH = tan( fovY / 360 * pi ) * zNear;
+    fW = fH * aspect;
+
+    glFrustum( -fW, fW, -fH, fH, zNear, zFar );
+}
+
 void MyWidget::resizeGL( int width, int height )
 {
     //TODO: What the hell is this?
@@ -293,7 +306,7 @@ void MyWidget::resizeGL( int width, int height )
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,150.0f);
+    perspectiveGL(45.0f,(GLfloat)width/(GLfloat)height,0.1f,150.0f);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -302,7 +315,7 @@ void MyWidget::initializeGL()
 {
     loadGLtextures();
 
-    model = MD2Model::load("models/girl.md2");
+    model = MD2Model::load(":/models/girl.md2");
     if (model) {
         model->setAnimation("run");
     }

@@ -21,6 +21,7 @@ public:
 
 protected:
     void initializeGL();
+    void perspectiveGL(GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar);
     void resizeGL( int width, int height );
     void paintGL();
     void loadGLtextures();
