@@ -1,0 +1,20 @@
+# Wavefront OBJ file
+# Exported by Misfit Model 3D 1.3.7
+# Tue Sep  7 11:48:59 2010
+
+# 3 Vertices
+v -16,000000 0,000000 -8,000000
+v 16,000000 0,000000 -8,000000
+v 0,000000 -0,000001 24,000000
+
+# 3 Texture Coordinates
+vt 1,000000 0,000000
+vt 0,000000 0,000000
+vt 0,000000 1,000000
+
+# 1 Ungrouped triangles
+
+o ungrouped
+g ungrouped
+
+f 3/1 2/2 1/3
