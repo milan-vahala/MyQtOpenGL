@@ -3,5 +3,8 @@
         <file>textures/Crate.bmp</file>
         <file>textures/Marble.jpg</file>
         <file>textures/Marble2.jpg</file>
+        <file>maps/cosik.obj</file>
+        <file>models/girl.md2</file>
+        <file>models/girl.bmp</file>
     </qresource>
 </RCC>

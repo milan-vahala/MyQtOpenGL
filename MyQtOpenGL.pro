@@ -13,7 +13,7 @@ SOURCES += main.cpp \
     md2model.cpp
 
 RESOURCES += \
-    textures.qrc
+    resources.qrc
 
 OTHER_FILES += \
     TODO.txt
