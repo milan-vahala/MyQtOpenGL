@@ -6,11 +6,11 @@
 #include <cmath>
 
 MyWidget::MyWidget(QWidget *parent) :
-        QGLWidget(parent), z(0), viewZ(1.5), myHeight(1.8), stepSize(0.8), angle(0),
-        verticalAngle(0), rotateStepSize(5), g(9.81), dt(30)
+        QGLWidget(parent), z(0), viewZ(1.5), myHeight(1.8f), stepSize(0.8f), angle(0),
+        verticalAngle(0), rotateStepSize(5), g(9.81f), dt(30)
 {
     position = QPointF(0,0);
-    maxStepZ=stepSize*0.8;
+    maxStepZ=stepSize * 0.8f;
 
     ObjParser parser;
     QString fileName(":/maps/cosik.obj");
@@ -26,13 +26,14 @@ MyWidget::MyWidget(QWidget *parent) :
 
     modelState.position = QPointF(0,4);
     modelState.z = 0;
-    modelState.myHeight = 0.8;
-    modelState.stepSize = 2.4;
+    modelState.myHeight = 0.8f;
+    modelState.stepSize = 2.4f;
     modelState.angle = 180;
 }
 
 MyWidget::~MyWidget(){
     delete gravityTimer;
+    delete motionTimer;
     delete model;
 }
 
@@ -92,10 +93,10 @@ void MyWidget::mouseMoveEvent(QMouseEvent *event){
 //TODO: test if this method is working correctly
 void MyWidget::normalizeAngle(float &angle){
     if (angle>360){
-        angle-=(int)angle%360*360;
+        angle-=static_cast<int>(angle)%360*360;
     }
     else if (angle<0){
-        angle+=(-(int)angle)%360*360;
+        angle+=-static_cast<int>(angle)%360*360;
     }
 }
 
@@ -215,7 +216,7 @@ void MyWidget::startGravity(const QVector3D& velocity){
 }
 
 void MyWidget::applyGravity(){
-    t+=dt*0.001;
+    t+=dt*0.001f;
     QVector3D moveDirection=(v0 + g*t*QVector3D(0,0,-1))*t;
     if (canMove(moveDirection)){
         position+=moveDirection.toPointF();
@@ -277,8 +278,8 @@ void MyWidget::paintGL()
         glTranslatef(modelState.position.x(), modelState.position.y(), modelState.z+modelState.myHeight);
         //glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
         //glRotatef(modelState.angle-90, 1.0f, 0.0f, 0.0f);
-        glRotatef(90-modelState.angle, 0.0f, 0.0f, 1.0f);
-        float scale=0.035;
+        glRotatef(90-modelState.angle, 0.0, 0.0, 1.0);
+        float scale=0.035f;
         glScalef(scale, scale, scale);
         model->draw();
         glPopMatrix();
@@ -302,11 +303,11 @@ void MyWidget::resizeGL( int width, int height )
     //TODO: What the hell is this?
     height = height?height:1;
 
-    glViewport( 0, 0, (GLint)width, (GLint)height );
+    glViewport(0, 0, static_cast<GLint>(width), static_cast<GLint>(height) );
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    perspectiveGL(45.0f,(GLfloat)width/(GLfloat)height,0.1f,150.0f);
+    perspectiveGL(45.0, static_cast<GLdouble>(width) / static_cast<GLdouble>(height), 0.1, 150.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }

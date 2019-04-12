@@ -4,7 +4,7 @@
 int main( int argc, char **argv )
 {
         QApplication app( argc, argv );
-        MyWidget widget;// = new MyWidget();
+        MyWidget widget;
         widget.show();
         return app.exec();
 }

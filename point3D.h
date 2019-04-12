@@ -8,10 +8,8 @@ class Point3D : public QPoint
 public:
     Point3D() : QPoint(0,0), iZ(0) {}
     Point3D(int x, int y, int z) : QPoint(x,y), iZ(z) {}
-    Point3D(const Point3D& point)
+    Point3D(const Point3D& point) : QPoint(point)
     {
-        setX( point.x() );
-        setY( point.y() );
         iZ = point.iZ;
     }
 

@@ -16,7 +16,7 @@ class MyWidget : public QGLWidget
 {
     Q_OBJECT    
 public:
-    MyWidget(QWidget *parent=0);
+    MyWidget(QWidget *parent=nullptr);
     ~MyWidget();
 
 protected:
