@@ -18,12 +18,20 @@ void ObjParser::parse(QString fileName)
         fetchFaces(t);
         //extractRects();
     } else {
-        QMessageBox::warning(0, "Error", "Can't open file");
+        QMessageBox::warning(nullptr, "Error", "Can't open file");
     }
 }
 
 QVector<Triangle> ObjParser::getTriangles(){
     return triangles;
+}
+
+namespace  {
+
+float toFloat(const QString& str) {
+    return QString(str).replace(',', '.').toFloat();
+}
+
 }
 
 void ObjParser::fetchVertices(QTextStream &t){
@@ -38,9 +46,9 @@ void ObjParser::fetchVertices(QTextStream &t){
     } while (pos==-1);
 
     do {    //matching pattern found
-        float x = vertexRx.cap(1).toFloat();
-        float y = vertexRx.cap(4).toFloat();
-        float z =  vertexRx.cap(7).toFloat();
+        float x = toFloat(vertexRx.cap(1));
+        float y = toFloat(vertexRx.cap(4));
+        float z =  toFloat(vertexRx.cap(7));
         vertices << QVector3D(x,z,y);   //change because my different view
 
         line=t.readLine();
@@ -60,8 +68,8 @@ void ObjParser::fetchTextureCoordinates(QTextStream &t){
     } while (pos==-1);
 
     do {    //matching pattern found
-        float x = textureCoordinatesRx.cap(1).toFloat();
-        float y = textureCoordinatesRx.cap(4).toFloat();
+        float x = toFloat(textureCoordinatesRx.cap(1));
+        float y = toFloat(textureCoordinatesRx.cap(4));
         textureCoordinates << QPointF(x,y);
 
         line=t.readLine();
