@@ -20,11 +20,10 @@
  * www.videotutorialsrock.com
  */
 
-#include <fstream>
-#include <QImage>
-//#include <QGLWidget>  //used because QGLWidget::convertToGLFormat(*aImage);
-
 #include "md2model.h"
+
+#include <QImage>
+#include <QFile>
 
 using namespace std;
 
@@ -242,39 +241,41 @@ namespace {
 	}
 	
 	//Reads the next four bytes as an integer, using little-endian form
-	int readInt(ifstream &input) {
+    int readInt(QIODevice &input) {
 		char buffer[4];
-		input.read(buffer, 4);
+        input.read(buffer, 4);
 		return toInt(buffer);
 	}
 	
 	//Reads the next two bytes as a short, using little-endian form
-	short readShort(ifstream &input) {
+    short readShort(QIODevice &input) {
 		char buffer[2];
 		input.read(buffer, 2);
 		return toShort(buffer);
 	}
 	
 	//Reads the next two bytes as an unsigned short, using little-endian form
-	unsigned short readUShort(ifstream &input) {
+    unsigned short readUShort(QIODevice &input) {
 		char buffer[2];
 		input.read(buffer, 2);
 		return toUShort(buffer);
 	}
 	
 	//Reads the next four bytes as a float, using little-endian form
-	float readFloat(ifstream &input) {
+    float readFloat(QIODevice &input) {
 		char buffer[4];
 		input.read(buffer, 4);
+
 		return toFloat(buffer);
 	}
 	
         //Calls readFloat three times and returns the results as a QVector3D object
-        QVector3D readQVector3D(ifstream &input) {
+        QVector3D readQVector3D(QIODevice &input) {
 		float x = readFloat(input);
 		float y = readFloat(input);
 		float z = readFloat(input);
-                return QVector3D(x, y, z);
+
+        return QVector3D(x, y, z);
 	}
 	
 	//Makes the image into a texture, and returns the id of the texture
@@ -292,41 +293,43 @@ namespace {
 }
 
 MD2Model::~MD2Model() {
-	if (frames != NULL) {
+    if (frames != nullptr) {
 		for(int i = 0; i < numFrames; i++) {
 			delete[] frames[i].vertices;
 		}
 		delete[] frames;
 	}
 	
-	if (texCoords != NULL) {
+    if (texCoords != nullptr) {
 		delete[] texCoords;
 	}
-	if (triangles != NULL) {
+    if (triangles != nullptr) {
 		delete[] triangles;
 	}
 }
 
 MD2Model::MD2Model() {
-	frames = NULL;
-	texCoords = NULL;
-	triangles = NULL;
+    frames = nullptr;
+    texCoords = nullptr;
+    triangles = nullptr;
 	time = 0;
 }
 
 //Loads the MD2 model
 MD2Model* MD2Model::load(const char* filename) {
-	ifstream input;
-	input.open(filename, istream::binary);
-	
+    QFile input(filename);
+    if (!input.open(QIODevice::ReadOnly)) {
+        return nullptr;
+    }
+
 	char buffer[64];
-	input.read(buffer, 4); //Should be "IPD2", if this is an MD2 file
+    input.read(buffer, 4); //Should be "IPD2", if this is an MD2 file
 	if (buffer[0] != 'I' || buffer[1] != 'D' ||
 		buffer[2] != 'P' || buffer[3] != '2') {
-		return NULL;
+        return nullptr;
 	}
 	if (readInt(input) != 8) { //The version number
-		return NULL;
+        return nullptr;
 	}
 	
 	int textureWidth = readInt(input);   //The width of the textures
@@ -352,7 +355,7 @@ MD2Model* MD2Model::load(const char* filename) {
 	readInt(input);                      //The offset to the end of the file
 	
 	//Load the texture
-	input.seekg(textureOffset, ios_base::beg);
+    input.seek(textureOffset);
 	input.read(buffer, 64);
         /*if (strlen(buffer) < 5 ||
 		strcmp(buffer + strlen(buffer) - 4, ".bmp") != 0) {
@@ -367,7 +370,7 @@ MD2Model* MD2Model::load(const char* filename) {
 	model->textureId = textureId;
 	
 	//Load the texture coordinates
-	input.seekg(texCoordOffset, ios_base::beg);
+    input.seek(texCoordOffset);
 	model->texCoords = new MD2TexCoord[numTexCoords];
 	for(int i = 0; i < numTexCoords; i++) {
 		MD2TexCoord* texCoord = model->texCoords + i;
@@ -376,7 +379,7 @@ MD2Model* MD2Model::load(const char* filename) {
 	}
 	
 	//Load the triangles
-	input.seekg(triangleOffset, ios_base::beg);
+    input.seek(triangleOffset);
 	model->triangles = new MD2Triangle[numTriangles];
 	model->numTriangles = numTriangles;
 	for(int i = 0; i < numTriangles; i++) {
@@ -390,7 +393,7 @@ MD2Model* MD2Model::load(const char* filename) {
 	}
 	
 	//Load the frames
-	input.seekg(frameOffset, ios_base::beg);
+    input.seek(frameOffset);
 	model->frames = new MD2Frame[numFrames];
 	model->numFrames = numFrames;
 	for(int i = 0; i < numFrames; i++) {
