@@ -5,7 +5,6 @@
 
 #include <QtGui>
 #include <QVector>
-#include <QPointF>
 #include <QPoint>
 #include <QTimer>
 
@@ -31,14 +30,14 @@ protected:
 private:
     //TODO: is using struct a good idea?
     struct figureState{
-        QPointF position;
+        QVector2D position;
         float z;
         float myHeight;
         float angle;
         float stepSize;
     };
 
-    QPointF position;   //x and y coordinates of current position
+    QVector2D position;   //x and y coordinates of current position
     float z;
     float viewZ;    //z-coordinate of eyes
     float myHeight;   //z-coordinato of head, must be greater than viewZ
@@ -65,8 +64,8 @@ private:
     float t;    //time
     QVector3D v0;   //starting velocity
 
-    void makeStep(const QPointF& newPosition);
-    bool makeStep(const QPointF& newPosition, figureState& newState);
+    void makeStep(const QVector2D& newPosition);
+    bool makeStep(const QVector2D& newPosition, figureState& newState);
     void normalizeAngle(float& angle);
     void startGravity(const QVector3D& velocity);
     bool canMove(const QVector3D& direction);

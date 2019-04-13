@@ -2,7 +2,7 @@
 #define TRIANGLE_H
 
 #include <QVector3D>
-#include <QPointF>
+#include <QVector2D>
 #include <qgl.h>
 
 class Triangle
@@ -14,7 +14,7 @@ public:
     Triangle(QVector3D aA, QVector3D aB, QVector3D aC, int aIndex);
     void render();
     void render(const GLuint& aTexture);
-    bool contains(const QPointF pos, float& z);
+    bool contains(const QVector2D pos, float& z);
     int getTextureIndex();
 
 private:

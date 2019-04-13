@@ -1,5 +1,7 @@
 #include "triangle.h"
 
+#include <QVector2D>
+
 Triangle::Triangle()
 {
 }
@@ -18,14 +20,17 @@ int Triangle::getTextureIndex(){
     return texIndex;
 }
 
-bool Triangle::contains(const QPointF pos, float &atZ)
+bool Triangle::contains(const QVector2D pos, float &atZ)
 {
-    atZ=0;
-    QPointF v1=(b-a).toPointF();
-    QPointF v2=(c-a).toPointF();
-    float e=v1.x(), f=v2.x(), g=v1.y(), h=v2.y();
-    float x=pos.x()-a.x();
-    float y=pos.y()-a.y();
+    atZ = 0;
+    QVector2D v1 = (b-a).toVector2D();
+    QVector2D v2 = (c-a).toVector2D();
+    float e=v1.x();
+    float f=v2.x();
+    float g=v1.y();
+    float h=v2.y();
+    float x = pos.x() - a.x();
+    float y = pos.y() - a.y();
 
     float denom=e*h-f*g;
     float r1=(h*x-f*y)/denom;

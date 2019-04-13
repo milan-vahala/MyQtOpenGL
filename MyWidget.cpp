@@ -9,8 +9,8 @@ MyWidget::MyWidget(QWidget *parent) :
         QGLWidget(parent), z(0), viewZ(1.5), myHeight(1.8f), stepSize(0.8f), angle(0),
         verticalAngle(0), rotateStepSize(5), g(9.81f), dt(30)
 {
-    position = QPointF(0,0);
-    maxStepZ=stepSize * 0.8f;
+    position = QVector2D(0, 0);
+    maxStepZ = stepSize * 0.8f;
 
     floor = ObjParser(":/maps/cosik.obj").getTriangles();
 
@@ -21,7 +21,7 @@ MyWidget::MyWidget(QWidget *parent) :
     connect(motionTimer, SIGNAL(timeout()), this, SLOT(updateMotion()));
     motionTimer->start(dt); //same timeout as when aplying gravity
 
-    modelState.position = QPointF(0,4);
+    modelState.position = QVector2D(0,4);
     modelState.z = 0;
     modelState.myHeight = 0.8f;
     modelState.stepSize = 2.4f;
@@ -36,7 +36,7 @@ MyWidget::~MyWidget(){
 
 void MyWidget::keyPressEvent ( QKeyEvent * event )
 {
-    QPointF view=stepSize*QTransform().rotate(-angle).map(QPointF(0,1));
+    QVector2D view = QVector2D(stepSize*QTransform().rotate(-angle).map(QPointF(0,1)));
     switch (event->key()){
     case Qt::Key_Up :
         if (!gravityTimer->isActive()){
@@ -97,7 +97,7 @@ void MyWidget::normalizeAngle(float &angle){
     }
 }
 
-void MyWidget::makeStep(const QPointF &newPosition)
+void MyWidget::makeStep(const QVector2D &newPosition)
 {
     QVector<float> possibleZ;
     float newZ;
@@ -129,7 +129,7 @@ void MyWidget::makeStep(const QPointF &newPosition)
 }
 
 //TODO: almost the same as makeStep(const QPointF &newPosition), merge somehow
-bool MyWidget::makeStep(const QPointF &newPosition, figureState& newState)
+bool MyWidget::makeStep(const QVector2D &newPosition, figureState& newState)
 {
     //different code here
     float z=newState.z;
@@ -172,7 +172,7 @@ bool MyWidget::makeStep(const QPointF &newPosition, figureState& newState)
 }
 
 bool MyWidget::canMove(const QVector3D &direction){
-    QPointF newPosition=position+direction.toPointF();
+    QVector2D newPosition=position + direction.toVector2D();
     //TODO: copy of code from makeStep(...) method, merge
     QVector<float> possibleZ;
     float newZ;
@@ -213,11 +213,11 @@ void MyWidget::startGravity(const QVector3D& velocity){
 }
 
 void MyWidget::applyGravity(){
-    t+=dt*0.001f;
-    QVector3D moveDirection=(v0 + g*t*QVector3D(0,0,-1))*t;
+    t += dt*0.001f;
+    QVector3D moveDirection = (v0 + g*t*QVector3D(0, 0, -1))*t;
     if (canMove(moveDirection)){
-        position+=moveDirection.toPointF();
-        z=z+moveDirection.z();
+        position += moveDirection.toVector2D();
+        z = z + moveDirection.z();
         update();
     } else {
         gravityTimer->stop();
@@ -229,7 +229,7 @@ void MyWidget::updateMotion(){
     if (model) {
         model->advance(progress);
     }
-    QPointF view=modelState.stepSize*QTransform().rotate(-modelState.angle).map(QPointF(0,1));
+    QVector2D view = QVector2D(modelState.stepSize*QTransform().rotate(-modelState.angle).map(QPointF(0,1)));
     if(!makeStep(modelState.position+progress*view, modelState)){
         modelState.angle+=60;
     }
