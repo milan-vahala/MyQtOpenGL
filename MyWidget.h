@@ -9,7 +9,7 @@
 #include <QTimer>
 
 #include "triangle.h"
-#include "md2model.h"
+#include "cameraview.h"
 #include "figure.h"
 
 class MyWidget : public QGLWidget
@@ -30,17 +30,9 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 private:
 
-    QVector2D position;   //x and y coordinates of current position
-    float z;
-    float viewZ;    //z-coordinate of eyes
-    float myHeight;   //z-coordinato of head, must be greater than viewZ
-    float maxStepZ;
-    float stepSize;
-    float angle;
-    float verticalAngle;
-    float rotateStepSize;
-    float VangleStep;
-    float HangleStep;
+    CameraView cameraView;
+    Figure figure;
+
     QVector<GLuint> texture;
     QVector<Triangle> floor;
     QVector<int> texIndex;
@@ -48,18 +40,6 @@ private:
 
     QTimer *gravityTimer;
     QTimer *motionTimer;
-
-    Figure figure;
-
-    float g;    //gravity constant
-    int dt;     //time change (in miliseconds)
-    float t;    //time
-    QVector3D v0;   //starting velocity
-
-    void makeStep(const QVector2D& newPosition);
-    void normalizeAngle(float& angle);
-    void startGravity(const QVector3D& velocity);
-    bool canMove(const QVector3D& direction);
 
 private slots:
     void applyGravity();

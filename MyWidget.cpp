@@ -1,28 +1,23 @@
 #include "MyWidget.h"
 #include "objparser.h"
 
-#include <QTransform>
 #include <QApplication>
-#include <cmath>
 
-MyWidget::MyWidget(QWidget *parent) :
-        QGLWidget(parent), z(0), viewZ(1.5), myHeight(1.8f), stepSize(0.8f), angle(0),
-        verticalAngle(0), rotateStepSize(5), g(9.81f), dt(30)
+MyWidget::MyWidget(QWidget *parent) : QGLWidget(parent)
 {
-    position = QVector2D(0, 0);
-    maxStepZ = stepSize * 0.8f;
-
     floor = ObjParser(":/maps/cosik.obj").getTriangles();
 
     figure.setFloor(floor);
+    cameraView.setFloor(floor);
 
     gravityTimer = new QTimer(this);
     connect(gravityTimer, SIGNAL(timeout()), this, SLOT(applyGravity()));
 
+    cameraView.setGravityTimer(gravityTimer);
+
     motionTimer = new QTimer(this);
     connect(motionTimer, SIGNAL(timeout()), this, SLOT(updateMotion()));
-    motionTimer->start(dt); //same timeout as when aplying gravity
-
+    motionTimer->start(30); //same timeout as when aplying gravity
 }
 
 MyWidget::~MyWidget(){
@@ -30,43 +25,29 @@ MyWidget::~MyWidget(){
     delete motionTimer;
 }
 
-namespace {
-
-QVector2D getView(float stepSize, float angle) {
-    double stepSizeD = static_cast<double>(stepSize);
-    double angleD = static_cast<double>(angle);
-
-    return QVector2D(stepSizeD*QTransform().rotate(-angleD).map(QPointF(0,1)));
-}
-
-}
-
 void MyWidget::keyPressEvent ( QKeyEvent * event )
 {
-    QVector2D view = getView(stepSize, angle);
     switch (event->key()){
     case Qt::Key_Up :
-        if (!gravityTimer->isActive()){
-            makeStep(position + view);
+        if (!gravityTimer->isActive()) {
+            cameraView.stepForward();
         }
         break;
     case Qt::Key_Down :
-        if (!gravityTimer->isActive()){
-            makeStep(position - view);
+        if (!gravityTimer->isActive()) {
+            cameraView.stepBack();
         }
         break;
     case Qt::Key_Left :
-        angle-=rotateStepSize;
-        normalizeAngle(angle);
+        cameraView.rotateLeft();
         update();
         break;
     case Qt::Key_Right :
-        angle+=rotateStepSize;
-        normalizeAngle(angle);
+        cameraView.rotateRight();
         update();
         break;
     case Qt::Key_Space :
-        startGravity(QVector3D(0,0,5));
+        cameraView.startGravity(QVector3D(0,0,5));
         break;
 
     }
@@ -86,106 +67,14 @@ void MyWidget::mouseMoveEvent(QMouseEvent *event){
          return;
 
      QPoint dragVector=event->pos() - dragStartPosition;
-     verticalAngle+=45.0f*dragVector.y()/height();
-     normalizeAngle(verticalAngle);
-     angle-=45.0f*dragVector.x()/height();
-     normalizeAngle(angle);
+     cameraView.turnVerticaly(45.0f * dragVector.y() / height());
+     cameraView.turnHorizontaly(-45.0f*dragVector.x()/height());
      update();
      dragStartPosition=event->pos();
 }
 
-//TODO: test if this method is working correctly
-void MyWidget::normalizeAngle(float &angle){
-    if (angle>360){
-        angle-=static_cast<int>(angle)%360*360;
-    }
-    else if (angle<0){
-        angle+=-static_cast<int>(angle)%360*360;
-    }
-}
-
-void MyWidget::makeStep(const QVector2D &newPosition)
-{
-    QVector<float> possibleZ;
-    float newZ;
-    for (QVector<Triangle>::iterator it=floor.begin(); it!=floor.end(); it++){
-        if (it->contains(newPosition, newZ)){
-            if ((newZ-z)<maxStepZ){
-                possibleZ.append(newZ);
-            }
-        }
-    }
-    const float minZ=-1000;
-    float Z=minZ;    //TODO: make this better
-    //searching highest Z which is under my possition
-    for (int i=0; i<possibleZ.size(); ++i){
-        float tmpZ(possibleZ.at(i));
-        if (tmpZ>Z){
-            Z=tmpZ;
-        }
-    }
-    if (Z>minZ){ //or possibleZ.size()==0
-        position=newPosition;
-        update();
-        if ((z-Z)>maxStepZ){
-            startGravity(QVector3D(0,0,0)); //start falling
-        } else {
-            z=Z;
-        }
-    }
-}
-
-bool MyWidget::canMove(const QVector3D &direction) {
-    QVector2D newPosition=position + direction.toVector2D();
-    //TODO: copy of code from makeStep(...) method, merge
-    QVector<float> possibleZ;
-    float newZ;
-    for (QVector<Triangle>::iterator it=floor.begin(); it!=floor.end(); it++){
-        if (it->contains(newPosition, newZ)){
-            if ((newZ-z)<maxStepZ){
-                possibleZ.append(newZ);
-            }
-            //testing if I crash my head into ceiling when jumping up
-            if (gravityTimer->isActive()){ // gravity on, I'm jumping or falling
-                if ( (newZ-(z+myHeight))*(newZ-(z+myHeight+direction.z()))<0 ){
-                    v0=QVector3D(0,0,0);
-                }
-            }
-        }
-    }
-    // end of copy from makeStep(...) method
-    int size=possibleZ.size();
-    if (size==0){
-        return false;
-    }
-    for (int i=0; i<size; ++i){
-        float tmpZ(possibleZ.at(i));
-        //test if crossing some plane when moving in vertical direction
-        if ( (tmpZ-z)*(tmpZ-(z+direction.z()))<0 ){
-            z=tmpZ;
-            update();
-            return false;
-        }
-    }
-    return true;
-}
-
-void MyWidget::startGravity(const QVector3D& velocity) {
-    v0=velocity;
-    t=0;
-    gravityTimer->start(dt);
-}
-
 void MyWidget::applyGravity() {
-    t += dt*0.001f;
-    QVector3D moveDirection = (v0 + g*t*QVector3D(0, 0, -1))*t;
-    if (canMove(moveDirection)){
-        position += moveDirection.toVector2D();
-        z = z + moveDirection.z();
-        update();
-    } else {
-        gravityTimer->stop();
-    }
+    cameraView.applyGravity();
 }
 
 void MyWidget::updateMotion() {
@@ -203,9 +92,9 @@ void MyWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
-    glRotatef(-90-verticalAngle,1,0,0);   //z-axis is UP, y-axis is FRONT
-    glRotatef(angle,0,0,1); //rotate camera to left and right
-    glTranslatef(-position.x(),-position.y(),-(z+viewZ));
+    glRotatef(-90 - cameraView.getVerticalAngle(), 1, 0, 0);   //z-axis is UP, y-axis is FRONT
+    glRotatef(cameraView.getAngle(), 0, 0, 1); //rotate camera to left and right
+    glTranslatef(-cameraView.getX(), -cameraView.getY(), -cameraView.getZ());
 
     GLfloat ambientColor[] = {1.3f, 1.3f, 1.3f, 1.0f};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
