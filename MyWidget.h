@@ -10,6 +10,7 @@
 
 #include "triangle.h"
 #include "md2model.h"
+#include "figure.h"
 
 class MyWidget : public QGLWidget
 {
@@ -28,14 +29,6 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 private:
-    //TODO: is using struct a good idea?
-    struct figureState{
-        QVector2D position;
-        float z;
-        float myHeight;
-        float angle;
-        float stepSize;
-    };
 
     QVector2D position;   //x and y coordinates of current position
     float z;
@@ -56,8 +49,7 @@ private:
     QTimer *gravityTimer;
     QTimer *motionTimer;
 
-    MD2Model* model;
-    figureState modelState;
+    Figure figure;
 
     float g;    //gravity constant
     int dt;     //time change (in miliseconds)
@@ -65,7 +57,6 @@ private:
     QVector3D v0;   //starting velocity
 
     void makeStep(const QVector2D& newPosition);
-    bool makeStep(const QVector2D& newPosition, figureState& newState);
     void normalizeAngle(float& angle);
     void startGravity(const QVector3D& velocity);
     bool canMove(const QVector3D& direction);

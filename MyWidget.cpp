@@ -14,6 +14,8 @@ MyWidget::MyWidget(QWidget *parent) :
 
     floor = ObjParser(":/maps/cosik.obj").getTriangles();
 
+    figure.setFloor(floor);
+
     gravityTimer = new QTimer(this);
     connect(gravityTimer, SIGNAL(timeout()), this, SLOT(applyGravity()));
 
@@ -21,17 +23,11 @@ MyWidget::MyWidget(QWidget *parent) :
     connect(motionTimer, SIGNAL(timeout()), this, SLOT(updateMotion()));
     motionTimer->start(dt); //same timeout as when aplying gravity
 
-    modelState.position = QVector2D(0,4);
-    modelState.z = 0;
-    modelState.myHeight = 0.8f;
-    modelState.stepSize = 2.4f;
-    modelState.angle = 180;
 }
 
 MyWidget::~MyWidget(){
     delete gravityTimer;
     delete motionTimer;
-    delete model;
 }
 
 namespace {
@@ -139,49 +135,6 @@ void MyWidget::makeStep(const QVector2D &newPosition)
     }
 }
 
-//TODO: almost the same as makeStep(const QPointF &newPosition), merge somehow
-bool MyWidget::makeStep(const QVector2D &newPosition, figureState& newState)
-{
-    //different code here
-    float z=newState.z;
-
-    //end of different code
-    QVector<float> possibleZ;
-    float newZ;
-    for (QVector<Triangle>::iterator it=floor.begin(); it!=floor.end(); it++){
-        if (it->contains(newPosition, newZ)){
-            if ((newZ-z)<maxStepZ){
-                possibleZ.append(newZ);
-            }
-        }
-    }
-    const float minZ=-1000;
-    float Z=minZ;    //TODO: make this better
-    //searching highest Z which is under my possition
-    for (int i=0; i<possibleZ.size(); ++i){
-        float tmpZ(possibleZ.at(i));
-        if (tmpZ>Z){
-            Z=tmpZ;
-        }
-    }
-    if (Z>minZ){ //or possibleZ.size()==0
-        //position=newPosition;
-        newState.position=newPosition;
-        //TODO: Do update realy here?
-        //update();
-        //if ((z-Z)>maxStepZ){
-            //falling for anything other then me not implemented
-            //startGravity(QVector3D(0,0,0)); //start falling
-        //} else {
-            //z=Z;
-            newState.z=Z;
-        //}
-        update();
-        return true;
-    }
-    return false;
-}
-
 bool MyWidget::canMove(const QVector3D &direction) {
     QVector2D newPosition=position + direction.toVector2D();
     //TODO: copy of code from makeStep(...) method, merge
@@ -236,14 +189,9 @@ void MyWidget::applyGravity() {
 }
 
 void MyWidget::updateMotion() {
-    float progress = 0.05f;
-    if (model) {
-        model->advance(progress);
-    }
-    QVector2D view = getView(modelState.stepSize, modelState.angle);
-    if (!makeStep(modelState.position + progress*view, modelState)) {
-        modelState.angle += 60;
-    }
+    figure.updateMotion();
+    //update();
+
     updateGL();
 }
 
@@ -281,17 +229,7 @@ void MyWidget::paintGL()
     }
 
     //Draw the guy
-    if (model) {
-        glPushMatrix();        
-        glTranslatef(modelState.position.x(), modelState.position.y(), modelState.z+modelState.myHeight);
-        //glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-        //glRotatef(modelState.angle-90, 1.0f, 0.0f, 0.0f);
-        glRotatef(90-modelState.angle, 0.0, 0.0, 1.0);
-        float scale=0.035f;
-        glScalef(scale, scale, scale);
-        model->draw();
-        glPopMatrix();
-    }
+    figure.draw();
 }
 
 void MyWidget::perspectiveGL( GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar )
@@ -324,10 +262,7 @@ void MyWidget::initializeGL()
 {
     loadGLtextures();
 
-    model = MD2Model::load(":/models/girl.md2");
-    if (model) {
-        model->setAnimation("run");
-    }
+    figure.init();
 
     glEnable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);  //enable smooth shading

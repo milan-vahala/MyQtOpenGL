@@ -5,12 +5,15 @@ HEADERS += MyWidget.h \
     objparser.h \
     point3D.h \
     triangle.h \
-    md2model.h
+    md2model.h \
+    position.h \
+    figure.h
 SOURCES += main.cpp \
     MyWidget.cpp \
     objparser.cpp \
     triangle.cpp \
-    md2model.cpp
+    md2model.cpp \
+    figure.cpp
 
 RESOURCES += \
     resources.qrc
