@@ -34,9 +34,20 @@ MyWidget::~MyWidget(){
     delete model;
 }
 
+namespace {
+
+QVector2D getView(float stepSize, float angle) {
+    double stepSizeD = static_cast<double>(stepSize);
+    double angleD = static_cast<double>(angle);
+
+    return QVector2D(stepSizeD*QTransform().rotate(-angleD).map(QPointF(0,1)));
+}
+
+}
+
 void MyWidget::keyPressEvent ( QKeyEvent * event )
 {
-    QVector2D view = QVector2D(stepSize*QTransform().rotate(-angle).map(QPointF(0,1)));
+    QVector2D view = getView(stepSize, angle);
     switch (event->key()){
     case Qt::Key_Up :
         if (!gravityTimer->isActive()){
@@ -171,7 +182,7 @@ bool MyWidget::makeStep(const QVector2D &newPosition, figureState& newState)
     return false;
 }
 
-bool MyWidget::canMove(const QVector3D &direction){
+bool MyWidget::canMove(const QVector3D &direction) {
     QVector2D newPosition=position + direction.toVector2D();
     //TODO: copy of code from makeStep(...) method, merge
     QVector<float> possibleZ;
@@ -206,13 +217,13 @@ bool MyWidget::canMove(const QVector3D &direction){
     return true;
 }
 
-void MyWidget::startGravity(const QVector3D& velocity){
+void MyWidget::startGravity(const QVector3D& velocity) {
     v0=velocity;
     t=0;
     gravityTimer->start(dt);
 }
 
-void MyWidget::applyGravity(){
+void MyWidget::applyGravity() {
     t += dt*0.001f;
     QVector3D moveDirection = (v0 + g*t*QVector3D(0, 0, -1))*t;
     if (canMove(moveDirection)){
@@ -224,14 +235,14 @@ void MyWidget::applyGravity(){
     }
 }
 
-void MyWidget::updateMotion(){
-    float progress=0.05f;
+void MyWidget::updateMotion() {
+    float progress = 0.05f;
     if (model) {
         model->advance(progress);
     }
-    QVector2D view = QVector2D(modelState.stepSize*QTransform().rotate(-modelState.angle).map(QPointF(0,1)));
-    if(!makeStep(modelState.position+progress*view, modelState)){
-        modelState.angle+=60;
+    QVector2D view = getView(modelState.stepSize, modelState.angle);
+    if (!makeStep(modelState.position + progress*view, modelState)) {
+        modelState.angle += 60;
     }
     updateGL();
 }
