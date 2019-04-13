@@ -1,21 +1,20 @@
 #ifndef POINT3D_H
 #define POINT3D_H
 
-#include <QPoint>
 
-class Point3D : public QPoint
+class Point3D
 {
 public:
-    Point3D() : QPoint(0,0), iZ(0) {}
-    Point3D(int x, int y, int z) : QPoint(x,y), iZ(z) {}
-    Point3D(const Point3D& point) : QPoint(point)
-    {
-        iZ = point.iZ;
-    }
+    Point3D() : iX(0), iY(0), iZ(0) {}
+    Point3D(int x, int y, int z) : iX(x), iY(y), iZ(z) {}
 
-    int z()
-    {return iZ;}
+
+    int x() const {return iX;}
+    int y() const {return iY;}
+    int z() const {return iZ;}
 private:
+    int iX;
+    int iY;
     int iZ;
 };
 
