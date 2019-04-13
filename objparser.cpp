@@ -4,11 +4,7 @@
 
 #include "objparser.h"
 
-ObjParser::ObjParser()
-{
-}
-
-void ObjParser::parse(QString fileName)
+ObjParser::ObjParser(const QString& fileName)
 {
     QFile file(fileName);
     if ( file.open(QIODevice::ReadOnly) ) {    // file opened successfully
@@ -16,7 +12,6 @@ void ObjParser::parse(QString fileName)
         fetchVertices(t);
         fetchTextureCoordinates(t);
         fetchFaces(t);
-        //extractRects();
     } else {
         QMessageBox::warning(nullptr, "Error", "Can't open file");
     }
@@ -70,7 +65,7 @@ void ObjParser::fetchTextureCoordinates(QTextStream &t){
     do {    //matching pattern found
         float x = toFloat(textureCoordinatesRx.cap(1));
         float y = toFloat(textureCoordinatesRx.cap(4));
-        textureCoordinates << QPointF(x,y);
+        textureCoordinates << QVector2D(x,y);
 
         line=t.readLine();
         pos=textureCoordinatesRx.indexIn(line);
@@ -98,20 +93,3 @@ void ObjParser::fetchFaces(QTextStream &t){
         pos=facesRx.indexIn(line);
     } while (pos>-1);
 }
-
-/*      deprecated
-void ObjParser::extractRects(){
-    for (int i=1; i<faces.size(); ++i){
-        int a=faces[i-1].x();
-        int b=faces[i-1].y();
-        int d=faces[i-1].z();
-        int dd=faces[i].x();
-        int c=faces[i].y();
-        int aa=faces[i].z();
-        //TODO: make check if  d+(a-b) aprox== c
-        if (a==aa && d==dd ){
-            rects << Rect(vertices[a-1],vertices[b-1],vertices[c-1]);
-        }
-    }
-}
-*/

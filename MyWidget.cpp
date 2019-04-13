@@ -12,10 +12,7 @@ MyWidget::MyWidget(QWidget *parent) :
     position = QPointF(0,0);
     maxStepZ=stepSize * 0.8f;
 
-    ObjParser parser;
-    QString fileName(":/maps/cosik.obj");
-    parser.parse(fileName);
-    floor=parser.getTriangles();
+    floor = ObjParser(":/maps/cosik.obj").getTriangles();
 
     gravityTimer = new QTimer(this);
     connect(gravityTimer, SIGNAL(timeout()), this, SLOT(applyGravity()));
@@ -326,7 +323,7 @@ void MyWidget::initializeGL()
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     //background color is "sky blue"
     //glClearColor(0.7f, 0.9f, 1.0f, 0.3f);
-    glClearDepth(1.0f);
+    glClearDepth(1.0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
