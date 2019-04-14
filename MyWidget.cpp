@@ -29,14 +29,10 @@ void MyWidget::keyPressEvent ( QKeyEvent * event )
 {
     switch (event->key()) {
     case Qt::Key_Up :
-        if (!cameraView->gravityOn()) {
-            cameraView->step(STEP_SIZE);
-        }
+        cameraView->step(STEP_SIZE);
         break;
     case Qt::Key_Down :
-        if (!cameraView->gravityOn()) {
-            cameraView->step(-STEP_SIZE);
-        }
+        cameraView->step(-STEP_SIZE);
         break;
     case Qt::Key_Left :
         cameraView->turnHorizontaly(-ROTATE_STEP_SIZE);
@@ -47,9 +43,7 @@ void MyWidget::keyPressEvent ( QKeyEvent * event )
         update();
         break;
     case Qt::Key_Space :
-        if (!cameraView->gravityOn()) {
-            cameraView->startGravity(QVector3D(0,0,5));
-        }
+        cameraView->startGravity(QVector3D(0,0,5));
         break;
     }
 }

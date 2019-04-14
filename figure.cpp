@@ -1,7 +1,7 @@
 #include "figure.h"
 
 Figure::Figure(QVector<Triangle> *aFloor)
-    : position(aFloor, 0.8f, 0, 4, 0, 180), stepSize(2.4f)
+    : position(aFloor, 0.8f, 0, 6, 50, 180), stepSize(2.4f)
 {
 }
 
@@ -20,13 +20,17 @@ void Figure::initModel() {
 }
 
 void Figure::updateMotion() {
-    float progress = 0.05f;
-    if (model) {
-        model->advance(progress);
-    }
+    if (position.gravityOn()) {
+         position.applyGravity();
+    } else {
+        float progress = 0.05f;
+        if (model) {
+            model->advance(progress);
+        }
 
-    if (!position.step(progress * stepSize)) {
-        position.turnHorizontaly(60);
+        if (!position.step(progress * stepSize)) {
+            position.turnHorizontaly(60);
+        }
     }
 }
 

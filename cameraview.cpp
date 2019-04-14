@@ -1,7 +1,7 @@
 #include "cameraview.h"
 
 CameraView::CameraView(QVector<Triangle>* aFloor) :
-    position(aFloor, 1.8f), verticalAngle(0), viewZ(1.5)
+    position(aFloor, 1.8f, 0, 0, 50), verticalAngle(0), viewZ(1.5)
 {    
 }
 
@@ -32,9 +32,6 @@ float CameraView::getAngle() const {
 }
 
 
-bool CameraView::gravityOn() const {
-    return position.gravityOn();
-}
 
 void CameraView::startGravity(const QVector3D &velocity) {
     position.startGravity(velocity);

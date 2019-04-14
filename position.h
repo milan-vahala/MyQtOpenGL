@@ -9,10 +9,8 @@ class Position {
 
 public:
     Position(QVector<Triangle> *aFloor, float aHeight,
-             float ax = 0, float ay = 0, float az = 0, float aAngle = 0)
-        : floor(aFloor), position(ax, ay), z(az), angle(aAngle),
-          myHeight(aHeight), maxStepZ(0.8f * 0.8f), dt(30), applyingGravity(false)
-    { }
+             float ax = 0, float ay = 0, float az = 0, float aAngle = 0);
+
     float getX() const { return position.x(); }
     float getY() const { return position.y(); }
     float getZ() const { return z; }

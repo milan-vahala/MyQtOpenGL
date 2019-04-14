@@ -1,5 +1,13 @@
 #include "position.h"
 
+Position::Position(QVector<Triangle> *aFloor, float aHeight,
+         float ax, float ay, float az, float aAngle)
+    : floor(aFloor), position(ax, ay), z(az), angle(aAngle),
+      myHeight(aHeight), maxStepZ(0.8f * 0.8f), dt(30)
+{
+    startGravity(QVector3D(0, 0, 0));
+}
+
 namespace {
 
 QVector2D getView(float stepSize, float angle) {
@@ -12,9 +20,16 @@ QVector2D getView(float stepSize, float angle) {
 }
 
 bool Position::step(float stepSize) {
-    QVector2D view = getView(stepSize, angle);
+    bool result;
+    if (!applyingGravity) {
+        QVector2D view = getView(stepSize, angle);
 
-    return makeStep(position + view);
+        result = makeStep(position + view);
+    } else {
+        result = false;
+    }
+
+    return result;
 }
 
 void Position::turnHorizontaly(float turnAngle) {
@@ -102,24 +117,24 @@ bool Position::canMove(const QVector3D &direction) {
 }
 
 void Position::startGravity(const QVector3D& velocity) {
-    v0 = velocity;
-    t = 0;
-    applyingGravity = true;
+    if (!applyingGravity) {
+        v0 = velocity;
+        t = 0;
+        applyingGravity = true;
+    }
 }
 
 void Position::applyGravity() {
-    if (!applyingGravity) {
-        return;
-    }
+    if (applyingGravity) {
+        static const float g = 9.81f;   // Gravitational acceleration
 
-    static const float g = 9.81f;   // Gravitational acceleration
-
-    t += dt * 0.001f;
-    QVector3D moveDirection = (v0 + g * t * QVector3D(0, 0, -1)) * t;
-    if (canMove(moveDirection)) {
-        position += moveDirection.toVector2D();
-        z = z + moveDirection.z();
-    } else {
-        applyingGravity = false;
+        t += dt * 0.001f;
+        QVector3D moveDirection = (v0 + g * t * QVector3D(0, 0, -1)) * t;
+        if (canMove(moveDirection)) {
+            position += moveDirection.toVector2D();
+            z = z + moveDirection.z();
+        } else {
+            applyingGravity = false;
+        }
     }
 }
