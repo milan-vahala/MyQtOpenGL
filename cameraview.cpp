@@ -2,19 +2,13 @@
 
 #include <QTimer>
 
-CameraView::CameraView() : z(0), viewZ(1.5), myHeight(1.8f), stepSize(0.8f), angle(0),
-verticalAngle(0), rotateStepSize(5), g(9.81f), dt(30)
+CameraView::CameraView(QVector<Triangle>* aFloor, QTimer *timer) :
+    z(0), viewZ(1.5), myHeight(1.8f), stepSize(0.8f), angle(0),
+    verticalAngle(0), rotateStepSize(5), g(9.81f), dt(30),
+    floor(aFloor), gravityTimer(timer)
 {
     position = QVector2D(0, 0);
     maxStepZ = stepSize * 0.8f;
-}
-
-void CameraView::setFloor(QVector<Triangle> aFloor) {
-   floor = aFloor;
-}
-
-void CameraView::setGravityTimer(QTimer *timer) {
-    gravityTimer = timer;
 }
 
 namespace {
@@ -94,7 +88,7 @@ void CameraView::makeStep(const QVector2D &newPosition)
 {
     QVector<float> possibleZ;
     float newZ;
-    for (QVector<Triangle>::iterator it=floor.begin(); it!=floor.end(); it++){
+    for (QVector<Triangle>::iterator it=floor->begin(); it!=floor->end(); it++){
         if (it->contains(newPosition, newZ)){
             if ((newZ-z)<maxStepZ){
                 possibleZ.append(newZ);
@@ -126,7 +120,7 @@ bool CameraView::canMove(const QVector3D &direction) {
     //TODO: copy of code from makeStep(...) method, merge
     QVector<float> possibleZ;
     float newZ;
-    for (QVector<Triangle>::iterator it=floor.begin(); it!=floor.end(); it++){
+    for (QVector<Triangle>::iterator it=floor->begin(); it!=floor->end(); it++){
         if (it->contains(newPosition, newZ)){
             if ((newZ-z)<maxStepZ){
                 possibleZ.append(newZ);

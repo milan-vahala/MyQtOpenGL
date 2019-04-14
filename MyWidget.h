@@ -30,16 +30,16 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 private:
 
-    CameraView cameraView;
-    Figure figure;
+    QTimer *gravityTimer;
+    QTimer *motionTimer;
+
+    CameraView *cameraView;
+    Figure *figure;
 
     QVector<GLuint> texture;
     QVector<Triangle> floor;
     QVector<int> texIndex;
     QPoint dragStartPosition;
-
-    QTimer *gravityTimer;
-    QTimer *motionTimer;
 
 private slots:
     void applyGravity();

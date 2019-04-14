@@ -1,6 +1,6 @@
 #include "figure.h"
 
-Figure::Figure() : floor(QVector<Triangle>())
+Figure::Figure(QVector<Triangle> *aFloor) : floor(aFloor)
 {
     modelState.position = QVector2D(0,4);
     modelState.z = 0;
@@ -13,14 +13,12 @@ Figure::Figure() : floor(QVector<Triangle>())
 
 Figure::~Figure()
 {
-    delete model;
+    if (model) {
+        delete model;
+    }
 }
 
-void Figure::setFloor(QVector<Triangle> aFloor) {
-   floor = aFloor;
-}
-
-void Figure::init() {
+void Figure::initModel() {
     model = MD2Model::load(":/models/girl.md2");
     if (model) {
         model->setAnimation("run");
@@ -63,7 +61,7 @@ void Figure::draw() {
     }
 }
 
-//TODO: almost the same as makeStep(const QPointF &newPosition), merge somehow
+//TODO: almost the same as CameraView::makeStep(const QPointF &newPosition), merge somehow
 bool Figure::makeStep(const QVector2D &newPosition, figureState& newState)
 {
     //different code here
@@ -72,7 +70,7 @@ bool Figure::makeStep(const QVector2D &newPosition, figureState& newState)
     //end of different code
     QVector<float> possibleZ;
     float newZ;
-    for (QVector<Triangle>::iterator it=floor.begin(); it!=floor.end(); it++){
+    for (QVector<Triangle>::iterator it=floor->begin(); it!=floor->end(); it++){
         if (it->contains(newPosition, newZ)){
             if ((newZ-z)<maxStepZ){
                 possibleZ.append(newZ);

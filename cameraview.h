@@ -8,10 +8,7 @@
 class CameraView
 {
 public:
-    CameraView();
-
-    void setFloor(QVector<Triangle> floor);
-    void setGravityTimer(QTimer* timer);
+    CameraView(QVector<Triangle>* aFloor, QTimer *timer);
 
     float getAngle();
     float getVerticalAngle();
@@ -48,7 +45,7 @@ private:
     float t;    //time
     QVector3D v0;   //starting velocity
 
-    QVector<Triangle> floor;
+    QVector<Triangle> *floor;
 
     QTimer *gravityTimer;
 

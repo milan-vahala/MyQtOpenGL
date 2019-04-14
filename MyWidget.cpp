@@ -7,20 +7,21 @@ MyWidget::MyWidget(QWidget *parent) : QGLWidget(parent)
 {
     floor = ObjParser(":/maps/cosik.obj").getTriangles();
 
-    figure.setFloor(floor);
-    cameraView.setFloor(floor);
+    figure = new Figure(&floor);
 
     gravityTimer = new QTimer(this);
     connect(gravityTimer, SIGNAL(timeout()), this, SLOT(applyGravity()));
 
-    cameraView.setGravityTimer(gravityTimer);
+    cameraView = new CameraView(&floor, gravityTimer);
 
     motionTimer = new QTimer(this);
     connect(motionTimer, SIGNAL(timeout()), this, SLOT(updateMotion()));
     motionTimer->start(30); //same timeout as when aplying gravity
 }
 
-MyWidget::~MyWidget(){
+MyWidget::~MyWidget() {
+    delete figure;
+    delete cameraView;
     delete gravityTimer;
     delete motionTimer;
 }
@@ -30,24 +31,24 @@ void MyWidget::keyPressEvent ( QKeyEvent * event )
     switch (event->key()){
     case Qt::Key_Up :
         if (!gravityTimer->isActive()) {
-            cameraView.stepForward();
+            cameraView->stepForward();
         }
         break;
     case Qt::Key_Down :
         if (!gravityTimer->isActive()) {
-            cameraView.stepBack();
+            cameraView->stepBack();
         }
         break;
     case Qt::Key_Left :
-        cameraView.rotateLeft();
+        cameraView->rotateLeft();
         update();
         break;
     case Qt::Key_Right :
-        cameraView.rotateRight();
+        cameraView->rotateRight();
         update();
         break;
     case Qt::Key_Space :
-        cameraView.startGravity(QVector3D(0,0,5));
+        cameraView->startGravity(QVector3D(0,0,5));
         break;
 
     }
@@ -67,18 +68,18 @@ void MyWidget::mouseMoveEvent(QMouseEvent *event){
          return;
 
      QPoint dragVector=event->pos() - dragStartPosition;
-     cameraView.turnVerticaly(45.0f * dragVector.y() / height());
-     cameraView.turnHorizontaly(-45.0f*dragVector.x()/height());
+     cameraView->turnVerticaly(45.0f * dragVector.y() / height());
+     cameraView->turnHorizontaly(-45.0f*dragVector.x()/height());
      update();
      dragStartPosition=event->pos();
 }
 
 void MyWidget::applyGravity() {
-    cameraView.applyGravity();
+    cameraView->applyGravity();
 }
 
 void MyWidget::updateMotion() {
-    figure.updateMotion();
+    figure->updateMotion();
     //update();
 
     updateGL();
@@ -92,9 +93,9 @@ void MyWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
-    glRotatef(-90 - cameraView.getVerticalAngle(), 1, 0, 0);   //z-axis is UP, y-axis is FRONT
-    glRotatef(cameraView.getAngle(), 0, 0, 1); //rotate camera to left and right
-    glTranslatef(-cameraView.getX(), -cameraView.getY(), -cameraView.getZ());
+    glRotatef(-90 - cameraView->getVerticalAngle(), 1, 0, 0);   //z-axis is UP, y-axis is FRONT
+    glRotatef(cameraView->getAngle(), 0, 0, 1); //rotate camera to left and right
+    glTranslatef(-cameraView->getX(), -cameraView->getY(), -cameraView->getZ());
 
     GLfloat ambientColor[] = {1.3f, 1.3f, 1.3f, 1.0f};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
@@ -118,7 +119,7 @@ void MyWidget::paintGL()
     }
 
     //Draw the guy
-    figure.draw();
+    figure->draw();
 }
 
 void MyWidget::perspectiveGL( GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar )
@@ -151,7 +152,7 @@ void MyWidget::initializeGL()
 {
     loadGLtextures();
 
-    figure.init();
+    figure->initModel();
 
     glEnable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);  //enable smooth shading

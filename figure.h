@@ -9,12 +9,10 @@
 class Figure
 {
 public:
-    Figure();
+    Figure(QVector<Triangle>* aFloor);
     ~Figure();
 
-    void setFloor(QVector<Triangle> floor);
-
-    void init();
+    void initModel();
 
     void updateMotion();
     void draw();
@@ -22,7 +20,7 @@ public:
 private:
 
     //TODO: is using struct a good idea?
-    struct figureState{
+    struct figureState {
         QVector2D position;
         float z;
         float myHeight;
@@ -30,7 +28,7 @@ private:
         float stepSize;
     };
 
-    QVector<Triangle> floor;
+    QVector<Triangle>* floor;
 
     float maxStepZ;
 
