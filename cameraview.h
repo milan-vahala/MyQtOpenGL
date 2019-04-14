@@ -8,7 +8,7 @@
 class CameraView : public Position
 {
 public:
-    CameraView(QVector<Triangle>* aFloor, QTimer *timer);
+    CameraView(QVector<Triangle>* aFloor);
 
     float getVerticalAngle() const;
     void turnVerticaly(float turnAngle);

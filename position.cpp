@@ -74,8 +74,8 @@ bool Position::canMove(const QVector3D &direction) {
                 possibleZ.append(newZ);
             }
             //testing if I crash my head into ceiling when jumping up
-            if (gravityTimer->isActive()){ // gravity on, I'm jumping or falling
-                if ( (newZ-(z+myHeight))*(newZ-(z+myHeight+direction.z()))<0 ){
+            if (applyingGravity) { // gravity on, I'm jumping or falling
+                if ( (newZ-(z+myHeight))*(newZ-(z+myHeight+direction.z()))<0 ) {
                     v0=QVector3D(0,0,0);
                 }
             }
@@ -100,10 +100,14 @@ bool Position::canMove(const QVector3D &direction) {
 void Position::startGravity(const QVector3D& velocity) {
     v0 = velocity;
     t = 0;
-    gravityTimer->start(dt);
+    applyingGravity = true;
 }
 
 void Position::applyGravity() {
+    if (!applyingGravity) {
+        return;
+    }
+
     static const float g = 9.81f;   // Gravitational acceleration
 
     t += dt * 0.001f;
@@ -112,6 +116,6 @@ void Position::applyGravity() {
         position += moveDirection.toVector2D();
         z = z + moveDirection.z();
     } else {
-        gravityTimer->stop();
+        applyingGravity = false;
     }
 }

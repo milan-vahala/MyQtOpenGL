@@ -1,9 +1,7 @@
 #include "cameraview.h"
 
-#include <QTimer>
-
-CameraView::CameraView(QVector<Triangle>* aFloor, QTimer *timer) :
-    Position(aFloor, timer), verticalAngle(0), viewZ(1.5)
+CameraView::CameraView(QVector<Triangle>* aFloor) :
+    Position(aFloor), verticalAngle(0), viewZ(1.5)
 {    
 }
 

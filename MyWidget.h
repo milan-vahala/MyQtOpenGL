@@ -33,7 +33,6 @@ private:
     static const float STEP_SIZE;
     static const float ROTATE_STEP_SIZE;
 
-    QTimer *gravityTimer;
     QTimer *motionTimer;
 
     CameraView *cameraView;
@@ -45,8 +44,7 @@ private:
     QPoint dragStartPosition;
 
 private slots:
-    void applyGravity();
-    void updateMotion();
+   void updateMotion();
 };
 
 #endif // MYWIDGET_H

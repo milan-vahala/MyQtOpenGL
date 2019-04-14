@@ -2,17 +2,16 @@
 #define STATE_H
 
 #include <QVector2D>
-#include <QTimer>
 
 #include "triangle.h"
 
 class Position {
 
 public:
-    Position(QVector<Triangle> *aFloor, QTimer* aTimer,
+    Position(QVector<Triangle> *aFloor,
              float ax = 0, float ay = 0, float az = 0, float aAngle = 0)
-        : floor(aFloor), gravityTimer(aTimer), position(ax, ay), z(az), angle(aAngle),
-          myHeight(1.8f), maxStepZ(0.8f * 0.8f), dt(30)
+        : floor(aFloor), position(ax, ay), z(az), angle(aAngle),
+          myHeight(1.8f), maxStepZ(0.8f * 0.8f), dt(30), applyingGravity(false)
     { }
     float getX() const { return position.x(); }
     float getY() const { return position.y(); }
@@ -24,6 +23,7 @@ public:
 
     void startGravity(const QVector3D& velocity);
     void applyGravity();
+    bool gravityOn() const { return applyingGravity; }
 
 protected:
     void normalizeAngle(float &angle);
@@ -33,7 +33,6 @@ protected:
 
 private:
     QVector<Triangle> *floor;
-    QTimer *gravityTimer;
 
     QVector2D position;
     float z;
@@ -45,6 +44,8 @@ private:
     int dt;     //time change (in miliseconds)
     float t;    //time
     QVector3D v0;   //starting velocity
+
+    bool applyingGravity;
 };
 
 #endif // STATE_H

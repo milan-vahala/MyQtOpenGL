@@ -12,10 +12,7 @@ MyWidget::MyWidget(QWidget *parent) : QGLWidget(parent)
 
     figure = new Figure(&floor);
 
-    gravityTimer = new QTimer(this);
-    connect(gravityTimer, SIGNAL(timeout()), this, SLOT(applyGravity()));
-
-    cameraView = new CameraView(&floor, gravityTimer);
+    cameraView = new CameraView(&floor);
 
     motionTimer = new QTimer(this);
     connect(motionTimer, SIGNAL(timeout()), this, SLOT(updateMotion()));
@@ -25,7 +22,6 @@ MyWidget::MyWidget(QWidget *parent) : QGLWidget(parent)
 MyWidget::~MyWidget() {
     delete figure;
     delete cameraView;
-    delete gravityTimer;
     delete motionTimer;
 }
 
@@ -33,12 +29,12 @@ void MyWidget::keyPressEvent ( QKeyEvent * event )
 {
     switch (event->key()) {
     case Qt::Key_Up :
-        if (!gravityTimer->isActive()) {
+        if (!cameraView->gravityOn()) {
             cameraView->step(STEP_SIZE);
         }
         break;
     case Qt::Key_Down :
-        if (!gravityTimer->isActive()) {
+        if (!cameraView->gravityOn()) {
             cameraView->step(-STEP_SIZE);
         }
         break;
@@ -51,7 +47,7 @@ void MyWidget::keyPressEvent ( QKeyEvent * event )
         update();
         break;
     case Qt::Key_Space :
-        if (!gravityTimer->isActive()) {
+        if (!cameraView->gravityOn()) {
             cameraView->startGravity(QVector3D(0,0,5));
         }
         break;
@@ -78,13 +74,9 @@ void MyWidget::mouseMoveEvent(QMouseEvent *event){
      dragStartPosition=event->pos();
 }
 
-void MyWidget::applyGravity() {
-    cameraView->applyGravity();
-}
-
 void MyWidget::updateMotion() {
+    cameraView->applyGravity();
     figure->updateMotion();
-    //update();
 
     updateGL();
 }
