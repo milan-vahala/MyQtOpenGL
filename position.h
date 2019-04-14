@@ -26,11 +26,7 @@ public:
     void applyGravity();
     bool gravityOn() const { return applyingGravity; }
 
-protected:
-    void normalizeAngle(float &angle);
-
-    bool makeStep(const QVector2D& newPosition);
-    bool canMove(const QVector3D& direction);
+    static void normalizeAngle(float &angle);
 
 private:
     QVector<Triangle> *floor;
@@ -47,6 +43,9 @@ private:
     QVector3D v0;   //starting velocity
 
     bool applyingGravity;
+
+    bool makeStep(const QVector2D& newPosition);
+    bool canMove(const QVector3D& direction);
 };
 
 #endif // STATE_H

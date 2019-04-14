@@ -5,7 +5,7 @@
 
 #include "position.h"
 
-class CameraView : public Position
+class CameraView
 {
 public:
     CameraView(QVector<Triangle>* aFloor);
@@ -13,10 +13,20 @@ public:
     float getVerticalAngle() const;
     void turnVerticaly(float turnAngle);
 
-    float getZ() const;
+    bool step(float stepSize);
+    void turnHorizontaly(float turnAngle);
 
+    float getX() const;
+    float getY() const;
+    float getZ() const;
+    float getAngle() const;
+
+    bool gravityOn() const;
+    void startGravity(const QVector3D& velocity);
+    void applyGravity();
 
 private:
+    Position position;
     float verticalAngle;
 
     float viewZ;    //z-coordinate of eyes

@@ -4,7 +4,7 @@
 #include "position.h"
 #include "md2model.h"
 
-class Figure : Position
+class Figure
 {
 public:
     Figure(QVector<Triangle>* aFloor);
@@ -16,6 +16,7 @@ public:
     void draw();
 
 private:
+    Position position;
 
     float stepSize;
 

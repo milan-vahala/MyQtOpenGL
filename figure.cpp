@@ -1,7 +1,7 @@
 #include "figure.h"
 
 Figure::Figure(QVector<Triangle> *aFloor)
-    : Position(aFloor, 0.8f, 0, 4, 0, 100), stepSize(2.4f)
+    : position(aFloor, 0.8f, 0, 4, 0, 180), stepSize(2.4f)
 {
 }
 
@@ -25,16 +25,16 @@ void Figure::updateMotion() {
         model->advance(progress);
     }
 
-    if (!step(progress * stepSize)) {
-        turnHorizontaly(60);
+    if (!position.step(progress * stepSize)) {
+        position.turnHorizontaly(60);
     }
 }
 
 void Figure::draw() {
     if (model) {
         glPushMatrix();
-        glTranslatef(getX(), getY(), getZ() + getHeight());
-        glRotatef(90 - getAngle(), 0.0, 0.0, 1.0);
+        glTranslatef(position.getX(), position.getY(), position.getZ() + position.getHeight());
+        glRotatef(90 - position.getAngle(), 0.0, 0.0, 1.0);
         float scale = 0.035f;
         glScalef(scale, scale, scale);
         model->draw();
