@@ -30,6 +30,9 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 private:
 
+    static const float STEP_SIZE;
+    static const float ROTATE_STEP_SIZE;
+
     QTimer *gravityTimer;
     QTimer *motionTimer;
 

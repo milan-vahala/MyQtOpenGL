@@ -16,16 +16,13 @@ public:
     float getY();
     float getZ();
 
+    void step(float stepSize);
     void turnHorizontaly(float turnAngle);
     void turnVerticaly(float turnAngle);
 
     void startGravity(const QVector3D& velocity);
     void applyGravity();
 
-    void stepForward();
-    void stepBack();
-    void rotateLeft();
-    void rotateRight();
 
 private:
     QVector2D position;   //x and y coordinates of current position
@@ -33,14 +30,11 @@ private:
     float viewZ;    //z-coordinate of eyes
     float myHeight;   //z-coordinato of head, must be greater than viewZ
     float maxStepZ;
-    float stepSize;
     float angle;
     float verticalAngle;
-    float rotateStepSize;
     float VangleStep;
     float HangleStep;
 
-    float g;    //gravity constant
     int dt;     //time change (in miliseconds)
     float t;    //time
     QVector3D v0;   //starting velocity

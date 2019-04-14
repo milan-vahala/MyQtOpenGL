@@ -3,6 +3,9 @@
 
 #include <QApplication>
 
+const float MyWidget::STEP_SIZE = 0.8f;
+const float MyWidget::ROTATE_STEP_SIZE = 5;
+
 MyWidget::MyWidget(QWidget *parent) : QGLWidget(parent)
 {
     floor = ObjParser(":/maps/cosik.obj").getTriangles();
@@ -28,29 +31,30 @@ MyWidget::~MyWidget() {
 
 void MyWidget::keyPressEvent ( QKeyEvent * event )
 {
-    switch (event->key()){
+    switch (event->key()) {
     case Qt::Key_Up :
         if (!gravityTimer->isActive()) {
-            cameraView->stepForward();
+            cameraView->step(STEP_SIZE);
         }
         break;
     case Qt::Key_Down :
         if (!gravityTimer->isActive()) {
-            cameraView->stepBack();
+            cameraView->step(-STEP_SIZE);
         }
         break;
     case Qt::Key_Left :
-        cameraView->rotateLeft();
+        cameraView->turnHorizontaly(-ROTATE_STEP_SIZE);
         update();
         break;
     case Qt::Key_Right :
-        cameraView->rotateRight();
+        cameraView->turnHorizontaly(ROTATE_STEP_SIZE);
         update();
         break;
     case Qt::Key_Space :
-        cameraView->startGravity(QVector3D(0,0,5));
+        if (!gravityTimer->isActive()) {
+            cameraView->startGravity(QVector3D(0,0,5));
+        }
         break;
-
     }
 }
 

@@ -3,12 +3,12 @@
 #include <QTimer>
 
 CameraView::CameraView(QVector<Triangle>* aFloor, QTimer *timer) :
-    z(0), viewZ(1.5), myHeight(1.8f), stepSize(0.8f), angle(0),
-    verticalAngle(0), rotateStepSize(5), g(9.81f), dt(30),
+    z(0), viewZ(1.5), myHeight(1.8f), angle(0),
+    verticalAngle(0), dt(30),
     floor(aFloor), gravityTimer(timer)
 {
     position = QVector2D(0, 0);
-    maxStepZ = stepSize * 0.8f;
+    maxStepZ = 0.8f * 0.8f;
 }
 
 namespace {
@@ -62,26 +62,10 @@ void CameraView::turnVerticaly(float turnAngle) {
     normalizeAngle(verticalAngle);
 }
 
-void CameraView::stepForward() {
+void CameraView::step(float stepSize) {
     QVector2D view = getView(stepSize, angle);
 
     makeStep(position + view);
-}
-
-void CameraView::stepBack() {
-    QVector2D view = getView(stepSize, angle);
-
-    makeStep(position - view);
-}
-
-void CameraView::rotateLeft() {
-    angle -= rotateStepSize;
-    normalizeAngle(angle);
-}
-
-void CameraView::rotateRight() {
-    angle += rotateStepSize;
-    normalizeAngle(angle);
 }
 
 void CameraView::makeStep(const QVector2D &newPosition)
@@ -143,7 +127,6 @@ bool CameraView::canMove(const QVector3D &direction) {
         //test if crossing some plane when moving in vertical direction
         if ( (tmpZ-z)*(tmpZ-(z+direction.z()))<0 ){
             z=tmpZ;
-            //update();
             return false;
         }
     }
@@ -151,18 +134,19 @@ bool CameraView::canMove(const QVector3D &direction) {
 }
 
 void CameraView::startGravity(const QVector3D& velocity) {
-    v0=velocity;
-    t=0;
+    v0 = velocity;
+    t = 0;
     gravityTimer->start(dt);
 }
 
 void CameraView::applyGravity() {
-    t += dt*0.001f;
-    QVector3D moveDirection = (v0 + g*t*QVector3D(0, 0, -1))*t;
-    if (canMove(moveDirection)){
+    static const float g = 9.81f;   // Gravitational acceleration
+
+    t += dt * 0.001f;
+    QVector3D moveDirection = (v0 + g * t * QVector3D(0, 0, -1)) * t;
+    if (canMove(moveDirection)) {
         position += moveDirection.toVector2D();
         z = z + moveDirection.z();
-        //update();
     } else {
         gravityTimer->stop();
     }
