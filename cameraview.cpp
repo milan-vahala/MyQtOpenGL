@@ -1,7 +1,7 @@
 #include "cameraview.h"
 
 CameraView::CameraView(QVector<Triangle>* aFloor) :
-    Position(aFloor), verticalAngle(0), viewZ(1.5)
+    Position(aFloor, 1.8f), verticalAngle(0), viewZ(1.5)
 {    
 }
 

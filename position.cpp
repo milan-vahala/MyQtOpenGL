@@ -11,10 +11,10 @@ QVector2D getView(float stepSize, float angle) {
 
 }
 
-void Position::step(float stepSize) {
+bool Position::step(float stepSize) {
     QVector2D view = getView(stepSize, angle);
 
-    makeStep(position + view);
+    return makeStep(position + view);
 }
 
 void Position::turnHorizontaly(float turnAngle) {
@@ -32,7 +32,7 @@ void Position::normalizeAngle(float &angle) {
     }
 }
 
-void Position::makeStep(const QVector2D &newPosition)
+bool Position::makeStep(const QVector2D &newPosition)
 {
     QVector<float> possibleZ;
     float newZ;
@@ -52,15 +52,19 @@ void Position::makeStep(const QVector2D &newPosition)
             Z=tmpZ;
         }
     }
-    if (Z>minZ){ //or possibleZ.size()==0
-        position=newPosition;
-        //update();
-        if ((z-Z)>maxStepZ){
-            startGravity(QVector3D(0,0,0)); //start falling
+
+    bool result = false;
+    if (Z>minZ) { //or possibleZ.size()==0
+        position = newPosition;
+        result = true;
+        if ( (z-Z) > maxStepZ) {
+            startGravity(QVector3D(0, 0, 0)); //start falling
         } else {
             z=Z;
         }
     }
+
+    return result;
 }
 
 bool Position::canMove(const QVector3D &direction) {
