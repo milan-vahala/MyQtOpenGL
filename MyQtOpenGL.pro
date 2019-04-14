@@ -15,7 +15,8 @@ SOURCES += main.cpp \
     triangle.cpp \
     md2model.cpp \
     figure.cpp \
-    cameraview.cpp
+    cameraview.cpp \
+    position.cpp
 
 RESOURCES += \
     resources.qrc

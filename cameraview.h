@@ -3,48 +3,24 @@
 
 #include <QVector2D>
 
-#include "triangle.h"
+#include "position.h"
 
-class CameraView
+class CameraView : public Position
 {
 public:
     CameraView(QVector<Triangle>* aFloor, QTimer *timer);
 
-    float getAngle();
-    float getVerticalAngle();
-    float getX();
-    float getY();
-    float getZ();
-
-    void step(float stepSize);
-    void turnHorizontaly(float turnAngle);
+    float getVerticalAngle() const;
     void turnVerticaly(float turnAngle);
 
-    void startGravity(const QVector3D& velocity);
-    void applyGravity();
+    float getZ() const;
 
 
 private:
-    QVector2D position;   //x and y coordinates of current position
-    float z;
-    float viewZ;    //z-coordinate of eyes
-    float myHeight;   //z-coordinato of head, must be greater than viewZ
-    float maxStepZ;
-    float angle;
     float verticalAngle;
-    float VangleStep;
-    float HangleStep;
 
-    int dt;     //time change (in miliseconds)
-    float t;    //time
-    QVector3D v0;   //starting velocity
+    float viewZ;    //z-coordinate of eyes
 
-    QVector<Triangle> *floor;
-
-    QTimer *gravityTimer;
-
-    void makeStep(const QVector2D& newPosition);
-    bool canMove(const QVector3D& direction);
 };
 
 #endif // CAMERAVIEW_H
